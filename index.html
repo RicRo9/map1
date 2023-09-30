@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css"><link rel="stylesheet" href="css/L.Control.Locate.min.css">
+        <link rel="stylesheet" href="css/qgis2web.css"><link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/leaflet-control-geocoder.Geocoder.css">
+        <style>
+        #map {
+            width: 1050px;
+            height: 810px;
+        }
+            /* Add CSS styles for the title */
+            h1 {
+                text-align: center;
+                background-color: blue;
+                color: white;
+                font-weight: bold;
+                padding: 10px; /* Add padding for better spacing */
+            }
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <h1 style="text-align: center;">Are you within Mediacom's service footprint?</h1> <!-- Add this line -->
+        <div id="map">
+        
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script><script src="js/L.Control.Locate.min.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet-control-geocoder.Geocoder.js"></script>
+        <script src="data/NodeForWeb_Project_1.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Turf.js/6.3.0/turf.min.js"></script>
+        <script>
+        var map = L.map('map', {
+            zoomControl:true, maxZoom:28, minZoom:1
+        }).fitBounds([[19.37747587167941,-98.91008254804876],[45.81013081122015,-59.432669087107826]]);
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<aa>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        L.control.locate({locateOptions: {maxZoom: 19}}).addTo(map);
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+        }
+        map.createPane('pane_OSMStandard_0');
+        map.getPane('pane_OSMStandard_0').style.zIndex = 400;
+        var layer_OSMStandard_0 = L.tileLayer('http://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            pane: 'pane_OSMStandard_0',
+            opacity: 1.0,
+            attribution: '<a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors, MediacomGISSolutionsGroup, ER</a>',
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 19
+        });
+        layer_OSMStandard_0;
+        map.addLayer(layer_OSMStandard_0);
+        function pop_NodeForWeb_Project_1(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['POLYGON_CI'] !== null ? autolinker.link(feature.properties['POLYGON_CI'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['POLYGON_00'] !== null ? autolinker.link(feature.properties['POLYGON_00'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['POLYGON_ST'] !== null ? autolinker.link(feature.properties['POLYGON_ST'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                                    </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_NodeForWeb_Project_1_0() {
+            return {
+                pane: 'pane_NodeForWeb_Project_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 0.5,
+                fillColor: 'rgba(31,120,180,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_NodeForWeb_Project_1');
+        map.getPane('pane_NodeForWeb_Project_1').style.zIndex = 401;
+        map.getPane('pane_NodeForWeb_Project_1').style['mix-blend-mode'] = 'normal';
+        var layer_NodeForWeb_Project_1 = new L.geoJson(json_NodeForWeb_Project_1, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_NodeForWeb_Project_1',
+            layerName: 'layer_NodeForWeb_Project_1',
+            pane: 'pane_NodeForWeb_Project_1',
+            onEachFeature: pop_NodeForWeb_Project_1,
+            style: style_NodeForWeb_Project_1_0,
+        });
+
+        
+        bounds_group.addLayer(layer_NodeForWeb_Project_1);
+        map.addLayer(layer_NodeForWeb_Project_1);
+        var osmGeocoder = new L.Control.Geocoder({
+            collapsed: true,
+            position: 'topleft',
+            text: 'Search',
+            title: 'Testing'
+        }).addTo(map);
+        document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
+        .className += ' fa fa-search';
+        document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
+        .title += 'Search for a place';
+        // Add an event listener for geocoding results
+        osmGeocoder.on('markgeocode', function (e) {
+    // Get the search result location
+    var searchResult = e.geocode.center;
+    
+    // Convert the search result to a Turf.js point
+    var searchPoint = turf.point([searchResult.lng, searchResult.lat]);
+
+    // Perform a point-in-polygon check using Turf.js
+    var isWithinLayer = false;
+    layer_NodeForWeb_Project_1.eachLayer(function (layer) {
+        var layerGeoJSON = layer.toGeoJSON();
+        if (turf.booleanPointInPolygon(searchPoint, layerGeoJSON)) {
+            isWithinLayer = true;
+        }
+    });
+
+    // Create a popup
+    var popup = L.popup();
+
+    // Set the content of the popup based on the result
+    if (isWithinLayer) {
+        popup.setContent('Yes, this location is within Mediacom Service Area!');
+    } else {
+        popup.setContent('No, this location is not within Mediacom Service Area.');
+    }
+
+    // Open the popup at the search result location
+    popup.setLatLng(searchResult).openOn(map);
+});
+
+    
+    setBounds();
+</script>
+</body>
+</html>
